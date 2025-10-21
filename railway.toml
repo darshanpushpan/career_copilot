@@ -1,0 +1,11 @@
+[build]
+builder = "python"
+
+[deploy]
+startCommand = "python app.py"
+healthcheckPath = "/"
+
+[environments.production]
+variables = [
+  { name = "PERPLEXITY_API_KEY", generateValue = true }
+]
