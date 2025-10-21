@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Copilot - AI-Powered Resume Enhancement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+        
+        .card-gradient {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .animate-fadeInLeft {
+            animation: fadeInLeft 0.8s ease-out;
+        }
+        
+        .animate-fadeInRight {
+            animation: fadeInRight 0.8s ease-out;
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease-out;
+        }
+        
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .section-padding {
+            padding: 100px 0;
+        }
+        
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .shape:nth-child(2) { top: 20%; right: 10%; animation-delay: 2s; }
+        .shape:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 4s; }
+        .shape:nth-child(4) { bottom: 10%; right: 20%; animation-delay: 6s; }
+        
+        /* Navbar scrolled state for better visibility */
+        .nav-scrolled {
+            background: linear-gradient(135deg, #1f2937 0%, #312e81 100%); /* slate-800 to indigo-900 */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            border: 0; /* override glass border */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen overflow-x-hidden">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-effect">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-rocket text-2xl text-white"></i>
+                    <span class="text-xl font-bold text-white">Career Copilot</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="text-white hover:text-blue-200 transition-colors">Home</a>
+                    <a href="#features" class="text-white hover:text-blue-200 transition-colors">Features</a>
+                    <a href="#how-it-works" class="text-white hover:text-blue-200 transition-colors">How It Works</a>
+                    <a href="#analyze" class="text-white hover:text-blue-200 transition-colors">Get Started</a>
+                </div>
+                <button class="md:hidden text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-gradient min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="floating-shapes">
+            <div class="shape w-20 h-20 bg-white rounded-full"></div>
+            <div class="shape w-16 h-16 bg-white rounded-lg"></div>
+            <div class="shape w-12 h-12 bg-white rounded-full"></div>
+            <div class="shape w-24 h-24 bg-white rounded-lg"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <div class="animate-fadeInUp">
+                <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                    Transform Your
+                    <span class="text-yellow-300">Career</span>
+                    <br>with AI Power
+                </h1>
+                <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+                    Get personalized resume suggestions and compelling cover letters tailored to any job description using advanced AI reasoning
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="#analyze" class="btn-primary text-white px-8 py-4 rounded-full text-lg font-semibold hover-lift">
+                        <i class="fas fa-magic mr-2"></i>
+                        Start Analyzing
+                    </a>
+                    <a href="#features" class="glass-effect text-white px-8 py-4 rounded-full text-lg font-semibold hover-lift">
+                        <i class="fas fa-play mr-2"></i>
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <i class="fas fa-chevron-down text-white text-2xl"></i>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section-padding bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                    Powerful <span class="text-gradient">Features</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Everything you need to create compelling job applications that stand out from the competition
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card-gradient rounded-2xl p-8 hover-lift scroll-reveal">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-brain text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">AI-Powered Analysis</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Advanced reasoning models analyze your resume against job requirements to provide targeted suggestions
+                    </p>
+                </div>
+                
+                <div class="card-gradient rounded-2xl p-8 hover-lift scroll-reveal">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-file-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Smart Resume Enhancement</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Get specific recommendations to optimize keywords, quantify achievements, and improve formatting
+                    </p>
+                </div>
+                
+                <div class="card-gradient rounded-2xl p-8 hover-lift scroll-reveal">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-envelope text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Cover Letter Generation</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Receive compelling, personalized cover letters that highlight your unique value proposition
+                    </p>
+                </div>
+                
+                <div class="card-gradient rounded-2xl p-8 hover-lift scroll-reveal">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-upload text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Multiple File Formats</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Upload PDF, DOCX, or paste text directly - we support all common resume formats
+                    </p>
+                </div>
+                
+                <div class="card-gradient rounded-2xl p-8 hover-lift scroll-reveal">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-bolt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Lightning Fast</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Get results in seconds with our optimized AI models and efficient processing pipeline
+                    </p>
+                </div>
+                
+                <div class="card-gradient rounded-2xl p-8 hover-lift scroll-reveal">
+                    <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Secure & Private</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Your data is processed securely and never stored permanently on our servers
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="section-padding gradient-bg">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    How It <span class="text-yellow-300">Works</span>
+                </h2>
+                <p class="text-xl text-blue-100 max-w-3xl mx-auto">
+                    Get professional results in just three simple steps
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center scroll-reveal">
+                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-slow">
+                        <span class="text-3xl font-bold text-gradient">1</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Upload Your Resume</h3>
+                    <p class="text-blue-100 leading-relaxed">
+                        Paste your resume text or upload a file in PDF, DOCX, or DOC format
+                    </p>
+                </div>
+                
+                <div class="text-center scroll-reveal">
+                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-slow">
+                        <span class="text-3xl font-bold text-gradient">2</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Add Job Description</h3>
+                    <p class="text-blue-100 leading-relaxed">
+                        Copy and paste the complete job description you're applying for
+                    </p>
+                </div>
+                
+                <div class="text-center scroll-reveal">
+                    <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-slow">
+                        <span class="text-3xl font-bold text-gradient">3</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Get AI Insights</h3>
+                    <p class="text-blue-100 leading-relaxed">
+                        Receive personalized suggestions and a tailored cover letter instantly
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Analysis Section -->
+    <section id="analyze" class="section-padding bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 scroll-reveal">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+                    Ready to <span class="text-gradient">Transform</span> Your Career?
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Upload your resume and job description to get started with AI-powered career enhancement
+                </p>
+            </div>
+
+        <!-- Main Form -->
+        <div class="max-w-6xl mx-auto">
+            <form id="job-form" class="card-gradient rounded-3xl shadow-2xl p-8 mb-8 hover-lift scroll-reveal" enctype="multipart/form-data">
+                <!-- Model Selection -->
+                <div class="mb-8 p-6 gradient-bg rounded-2xl">
+                    <label class="block text-lg font-semibold text-white mb-4">
+                        <i class="fas fa-cogs mr-2"></i>
+                        AI Model Selection
+                    </label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label class="flex items-center p-4 bg-white bg-opacity-20 rounded-xl cursor-pointer hover:bg-opacity-30 transition-all">
+                            <input type="radio" name="ai_model" value="default" checked class="mr-3 text-blue-600">
+                            <div>
+                                <span class="text-white font-semibold block">Standard Model</span>
+                                <span class="text-blue-100 text-sm">Fast and efficient analysis with good quality results</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-4 bg-white bg-opacity-20 rounded-xl cursor-pointer hover:bg-opacity-30 transition-all">
+                            <input type="radio" name="ai_model" value="pro" class="mr-3 text-blue-600">
+                            <div>
+                                <span class="text-white font-semibold block">Pro Model</span>
+                                <span class="text-blue-100 text-sm">Enhanced capabilities with advanced reasoning and larger context</span>
+                            </div>
+                        </label>
+                    </div>
+                    <p class="text-blue-100 text-sm mt-4">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        AI models provide advanced analysis with comprehensive resume insights and personalized recommendations.
+                    </p>
+                </div>
+            
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Job Description Section -->
+                    <div class="scroll-reveal">
+                        <label for="job_description" class="block text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-briefcase mr-2 text-blue-600"></i>
+                            Job Description
+                        </label>
+                        <textarea 
+                            id="job_description" 
+                            name="job_description" 
+                            rows="12" 
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all hover:border-gray-300"
+                            placeholder="Paste the complete job description including requirements, responsibilities, and qualifications..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <!-- Resume Section -->
+                    <div class="scroll-reveal">
+                        <div class="mb-6">
+                            <label class="block text-lg font-semibold text-gray-800 mb-4">
+                                <i class="fas fa-file-alt mr-2 text-green-600"></i>
+                                Resume Input Method
+                            </label>
+                            <div class="flex space-x-6">
+                                <label class="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all">
+                                    <input type="radio" name="resume_method" value="text" checked class="mr-3 text-green-600">
+                                    <span class="font-medium text-gray-700">Paste Text</span>
+                                </label>
+                                <label class="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-all">
+                                    <input type="radio" name="resume_method" value="file" class="mr-3 text-green-600">
+                                    <span class="font-medium text-gray-700">Upload File</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Text Input -->
+                        <div id="resume-text-section">
+                            <label for="resume_text" class="block text-sm font-medium text-gray-700 mb-2">
+                                My Resume (Text)
+                            </label>
+                            <textarea 
+                                id="resume_text" 
+                                name="resume_text" 
+                                rows="10" 
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none transition-all hover:border-gray-300"
+                                placeholder="Paste your complete resume including work experience, education, skills, and achievements..."
+                            ></textarea>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div id="resume-file-section" class="hidden">
+                            <label for="resume_file" class="block text-sm font-medium text-gray-700 mb-2">
+                                Upload Resume File
+                            </label>
+                            <div class="mt-1 flex justify-center px-6 pt-8 pb-8 border-2 border-gray-300 border-dashed rounded-xl hover:border-green-400 transition-colors bg-gray-50 hover:bg-gray-100">
+                                <div class="space-y-3 text-center">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                                    <div class="flex text-sm text-gray-600">
+                                        <label for="resume_file" class="relative cursor-pointer bg-white rounded-lg font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500 px-4 py-2">
+                                            <span>Upload a file</span>
+                                            <input id="resume_file" name="resume_file" type="file" class="sr-only" accept=".pdf,.docx,.doc,.txt">
+                                        </label>
+                                        <p class="pl-2 self-center">or drag and drop</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500">
+                                        PDF, DOCX, DOC, or TXT up to 16MB
+                                    </p>
+                                </div>
+                            </div>
+                            <div id="file-info" class="mt-3 text-sm text-gray-600 hidden"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center mt-8">
+                    <button 
+                        type="submit" 
+                        class="btn-primary text-white font-bold py-4 px-12 rounded-full text-lg hover-lift"
+                    >
+                        <i class="fas fa-magic mr-2"></i>
+                        Generate Suggestions & Cover Letter
+                    </button>
+                </div>
+            </form>
+        </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="text-center mb-8 hidden scroll-reveal">
+                <div class="loading-spinner mx-auto mb-6"></div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">AI is Working Its Magic</h3>
+                <p class="text-gray-600 text-lg">Analyzing your resume and generating personalized suggestions...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
+                <!-- Job Match Insights -->
+                <div class="card-gradient rounded-3xl shadow-2xl p-8 hover-lift scroll-reveal lg:col-span-1">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-4">
+                        <i class="fas fa-chart-line text-green-500 mr-3"></i>
+                        Job Match Insights
+                    </h2>
+                    <div id="match-insights">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-gray-700 font-semibold">Match Score</span>
+                            <span id="match-score" class="text-2xl font-bold text-green-600">--%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3 mb-6">
+                            <div id="match-bar" class="bg-green-500 h-3 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800 mb-2">Strengths</h3>
+                                <ul id="match-strengths" class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                                    <li class="italic text-gray-500">Will populate after analysis</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800 mb-2">Gaps to Address</h3>
+                                <ul id="match-gaps" class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                                    <li class="italic text-gray-500">Will populate after analysis</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Resume Suggestions -->
+                <div class="card-gradient rounded-3xl shadow-2xl p-8 hover-lift scroll-reveal lg:col-span-1">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-4">
+                        <i class="fas fa-lightbulb text-yellow-500 mr-3"></i>
+                        Resume Enhancement Suggestions
+                    </h2>
+                    <div id="resume-suggestions" class="prose max-w-none">
+                        <p class="text-gray-500 italic text-lg">Your personalized resume suggestions will appear here...</p>
+                    </div>
+                </div>
+
+                <!-- Cover Letter -->
+                <div class="card-gradient rounded-3xl shadow-2xl p-8 hover-lift scroll-reveal lg:col-span-1">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-4">
+                        <i class="fas fa-envelope text-blue-500 mr-3"></i>
+                        Generated Cover Letter
+                    </h2>
+                    <div id="cover-letter" class="prose max-w-none">
+                        <p class="text-gray-500 italic text-lg">Your personalized cover letter will appear here...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="hidden mt-8 bg-red-100 border-2 border-red-400 text-red-700 px-6 py-4 rounded-xl scroll-reveal">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle text-xl mr-3"></i>
+                    <div>
+                        <strong class="font-bold text-lg">Error:</strong>
+                        <span id="error-text" class="ml-2"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-12">
+        <div class="container mx-auto px-6 text-center">
+            <div class="max-w-2xl mx-auto">
+                <div class="flex items-center justify-center space-x-2 mb-4">
+                    <i class="fas fa-rocket text-2xl"></i>
+                    <span class="text-xl font-bold">Career Copilot</span>
+                </div>
+                <p class="text-blue-100 text-sm leading-relaxed mb-6">
+                    A personal project for AI-powered resume enhancement and career guidance.
+                </p>
+                <div class="border-t border-white border-opacity-20 pt-6">
+                    <p class="text-blue-100 text-sm">
+                        © 2025 Darshan Pushpangadhan. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
