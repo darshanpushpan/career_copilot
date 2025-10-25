@@ -4,11 +4,11 @@ A **live web application** that helps users tailor their job applications by ana
 
 ## 🌐 Live Site
 
-**Career Copilot is now live and accessible at:** [https://your-deployment-url.com](https://your-deployment-url.com)
+**Career Copilot is now live and accessible at:** [Your Railway Deployment URL](https://your-deployment-url.railway.app)
 
 **GitHub Repository:** [https://github.com/darshanpushpan/career_copilot](https://github.com/darshanpushpan/career_copilot)
 
-No installation required - simply visit the live site to start using the application!
+No installation required - simply visit the Railway deployment URL to start using the application!
 
 ## Features
 
@@ -26,7 +26,7 @@ No installation required - simply visit the live site to start using the applica
 
 ## How to Use
 
-1. **Visit the live site**: Navigate to [https://your-deployment-url.com](https://your-deployment-url.com)
+1. **Visit the live site**: Navigate to [Your Railway Deployment URL](https://your-deployment-url.railway.app)
 2. **Select AI Model**: Choose between Sonar Reasoning or Sonar Reasoning Pro
 3. **Paste the job description** in the left textarea
 4. **Choose your resume input method**:
