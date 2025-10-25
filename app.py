@@ -19,15 +19,43 @@ except ImportError:
     # Fallback to environment variables if config.py doesn't exist
     PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')
     PERPLEXITY_API_URL = "https://api.perplexity.ai/chat/completions"
+    PERPLEXITY_DEFAULT_MODEL = "sonar-reasoning"
+    PERPLEXITY_PRO_MODEL = "sonar-reasoning-pro"
     DEFAULT_MODEL = os.getenv('DEFAULT_MODEL', 'sonar-reasoning')
     API_PROVIDER = "perplexity"
     MAX_TOKENS = 4000
     TEMPERATURE = 0.6
     ENSURE_COMPLETE_COVER_LETTER = True
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
+    ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'txt'}
+
+    # OpenAI API Settings
+    OPENAI_API_KEY = ""
+    OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
+    OPENAI_DEFAULT_MODEL = "gpt-4"
+    OPENAI_PRO_MODEL = "gpt-4-turbo"
+
+    # Anthropic API Settings
+    ANTHROPIC_API_KEY = ""
+    ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
+    ANTHROPIC_DEFAULT_MODEL = "claude-3-sonnet-20240229"
+    ANTHROPIC_PRO_MODEL = "claude-3-opus-20240229"
+
+    # Custom API Settings
+    CUSTOM_API_KEY = ""
+    CUSTOM_API_URL = ""
+    CUSTOM_DEFAULT_MODEL = ""
+    CUSTOM_PRO_MODEL = ""
 
 # Initialize Flask app
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+
+# Set max content length (define it here to ensure it's always available)
+try:
+    app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+except NameError:
+    # Fallback if MAX_CONTENT_LENGTH is not defined
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
