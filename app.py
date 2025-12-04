@@ -461,46 +461,34 @@ def analyze():
         cover_letter = ""
         match = None
         
-        # Enhanced parsing to ensure we get complete sections
-        if "### Job Match Analysis" in ai_response:
-            parts = ai_response.split("### Job Match Analysis")
-            if len(parts) > 1:
-                match_part = parts[1]
-                if "### Resume Enhancement Suggestions" in match_part:
-                    match_text, suggestions_part = match_part.split("### Resume Enhancement Suggestions", 1)
-                    
-                    # Extract JSON from match analysis section
-                    try:
-                        json_match = re.search(r'\{[\s\S]*"match"\s*:\s*\{[\s\S]*?\}[\s\S]*\}', match_text)
-                        if json_match:
-                            match_obj = json.loads(json_match.group(0))
-                            if isinstance(match_obj, dict) and 'match' in match_obj:
-                                match = match_obj['match']
-                    except Exception:
-                        match = None
-                    
-                    if "### Generated Cover Letter" in suggestions_part:
-                        suggestions, cover_letter_part = suggestions_part.split("### Generated Cover Letter", 1)
-                        cover_letter = cover_letter_part.strip()
-                        
-                        # Clean up both sections - remove any explanatory text
-                        if ENSURE_COMPLETE_COVER_LETTER:
-                            cover_letter = clean_cover_letter(cover_letter)
-                            suggestions = clean_resume_suggestions(suggestions)
-                    else:
-                        suggestions = clean_resume_suggestions(suggestions_part.strip())
-                else:
-                    # Extract JSON from match analysis section
-                    try:
-                        json_match = re.search(r'\{[\s\S]*"match"\s*:\s*\{[\s\S]*?\}[\s\S]*\}', match_part)
-                        if json_match:
-                            match_obj = json.loads(json_match.group(0))
-                            if isinstance(match_obj, dict) and 'match' in match_obj:
-                                match = match_obj['match']
-                    except Exception:
-                        match = None
-        else:
-            # Fallback: if format is not as expected, return the whole response as suggestions
+        # More robust parsing logic
+        match_section_raw = re.search(r"### Job Match Analysis(.*?)(?=### Resume Enhancement Suggestions|### Generated Cover Letter|$)", ai_response, re.DOTALL)
+        suggestions_section_raw = re.search(r"### Resume Enhancement Suggestions(.*?)(?=### Generated Cover Letter|$)", ai_response, re.DOTALL)
+        cover_letter_section_raw = re.search(r"### Generated Cover Letter(.*?)$", ai_response, re.DOTALL)
+
+        # Extract JSON from match analysis section
+        if match_section_raw:
+            match_text = match_section_raw.group(1)
+            try:
+                # A more robust regex to find a JSON object containing the 'match' key
+                json_match = re.search(r'\{\s*"match"\s*:\s*\{[^\}]*\}\s*\}', match_text, re.DOTALL)
+                if json_match:
+                    match_obj = json.loads(json_match.group(0))
+                    if isinstance(match_obj, dict) and 'match' in match_obj:
+                        match = match_obj['match']
+            except (json.JSONDecodeError, AttributeError):
+                match = None # Keep it None if parsing fails
+
+        # Extract and clean suggestions
+        if suggestions_section_raw:
+            suggestions = clean_resume_suggestions(suggestions_section_raw.group(1).strip())
+
+        # Extract and clean cover letter
+        if cover_letter_section_raw:
+            cover_letter = clean_cover_letter(cover_letter_section_raw.group(1).strip())
+
+        # Fallback if parsing fails to populate suggestions
+        if not suggestions and not cover_letter and not match:
             suggestions = ai_response
         
         # Check if we got actual content or just descriptions
