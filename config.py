@@ -12,20 +12,8 @@ API_PROVIDER = "perplexity"  # Options: "perplexity", "openai", "anthropic", "cu
 
 # Perplexity API Settings - Load from environment variable
 PERPLEXITY_API_KEY = os.getenv('PERPLEXITY_API_KEY')
-
-# --- DEBUGGING: Print the loaded API key to help diagnose deployment issues ---
-print(f"DEBUG: Attempting to load PERPLEXITY_API_KEY...")
-print(f"DEBUG: Value found: '{PERPLEXITY_API_KEY}'")
 if not PERPLEXITY_API_KEY:
-    print("DEBUG: PERPLEXITY_API_KEY is not set. The application will fail when an API call is made.")
-else:
-    print("DEBUG: PERPLEXITY_API_KEY loaded successfully.")
-# --- END DEBUGGING ---
-
-# Note: We will not raise an error here to allow the app to start on Railway.
-# The app will fail gracefully when it tries to make an API call if the key is missing.
-# if not PERPLEXITY_API_KEY:
-#     raise ValueError("PERPLEXITY_API_KEY environment variable is required. Please check your .env file.")
+    raise ValueError("PERPLEXITY_API_KEY environment variable is required. Please check your .env file.")
 
 PERPLEXITY_API_URL = "https://api.perplexity.ai/chat/completions"
 PERPLEXITY_DEFAULT_MODEL = "sonar-reasoning"
